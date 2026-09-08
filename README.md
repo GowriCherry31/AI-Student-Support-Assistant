@@ -380,17 +380,10 @@ The project is designed to run locally and does not require an OpenAI API key.
 
 Open Git Bash or a terminal and run:
 
-```bash
-git clone https://github.com/GowriCherry31/AI-Student-Support-Assistant.git
-
-## 6.2 Clone the Repository
-
-Open Git Bash or a terminal and run:
-
-```bash
 git clone https://github.com/GowriCherry31/AI-Student-Support-Assistant.git
 cd AI-Student-Support-Assistant
-6.3 Create a Virtual Environment
+
+## 6.3 Create a Virtual Environment
 
 Create a Python virtual environment:
 
@@ -403,15 +396,16 @@ source venv/Scripts/activate
 If using Command Prompt instead:
 
 venv\Scripts\activate
-6.4 Install Python Dependencies
+
+## 6.4 Install Python Dependencies
 
 Install the required packages:
 
 pip install -r requirements.txt
-6.5 Install and Start Ollama
 
-Install Ollama on your system and make sure the Ollama application is
-running.
+## 6.5 Install and Start Ollama
+
+Install Ollama on your system and make sure the Ollama application is running.
 
 Check that Ollama is available:
 
@@ -431,23 +425,18 @@ ollama list
 
 You should see the required models in the list.
 
-6.6 Run the Application
+## 6.6 Run the Application
 
 After activating the virtual environment and starting Ollama, run:
 
 streamlit run app.py
 
-Streamlit will provide a local address in the terminal. Open that address
-in your web browser to use the AI Learning & Study Assistant.
+Streamlit will provide a local address in the terminal. Open that address in your web browser to use the AI Learning & Study Assistant.
 
-6.7 Important Note
+## 6.7 Important Note
 
-The first model download can require significant disk space. The required
-storage depends on the Ollama models being downloaded.
+The first model download can require significant disk space. The required storage depends on the Ollama models being downloaded.
 
-Once the models are downloaded, the application can use them locally without
-requiring an OpenAI API key.
+Once the models are downloaded, the application can use them locally without requiring an OpenAI API key.
 
 No paid OpenAI service is required for this project.
-
-
