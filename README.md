@@ -29,14 +29,9 @@ with revision.
 The **AI Learning & Study Assistant** is a locally-run agentic AI system
 that helps students study from their own uploaded course material.
 
-It can:
-
-- Answer questions based on uploaded study material
-- Generate topic-wise quizzes
-- Create day-by-day study plans
-- Track learning progress
-- Identify weak topics
-- Remember previous interactions
+It answers questions grounded in the student's course material, generates
+topic-wise quizzes, builds day-by-day study plans, and tracks a student's
+progress and weak areas over time.
 
 The system combines three core agent capabilities:
 
@@ -44,256 +39,415 @@ The system combines three core agent capabilities:
 - **Persistent Memory**
 - **Tool Use**
 
-The project uses open-source, locally hosted AI models through **Ollama**,
-avoiding dependency on paid external APIs such as OpenAI.
+The project uses open-source, locally hosted models through **Ollama**,
+avoiding dependency on paid external APIs.
 
----
+**No OpenAI API key is required.**
 
 # 2. Objectives & Proposed Solution
 
-## 2.1 Project Objectives
+## 2.1 Objectives
 
-- Build a Retrieval-Augmented Generation (RAG) pipeline that answers
-  questions using the student's own course material.
-- Add a persistent memory layer that tracks conversation history, topics
-  covered, and quiz performance.
-- Implement agent tools for quiz generation and study-plan generation.
-- Reduce hallucinated answers using a similarity-score relevance threshold.
-- Provide a simple multi-subject web interface.
-- Run the AI locally using open-source models.
-- Avoid paid external API dependencies.
-- Keep student data stored locally.
+The main objectives of the AI Learning & Study Assistant are:
 
-## 2.2 How the Agentic AI Solution Works
+- Help students understand their own course material.
+- Provide answers grounded in uploaded study materials.
+- Reduce the risk of incorrect answers caused by relying only on general AI knowledge.
+- Generate topic-wise quizzes for self-assessment.
+- Create personalized study plans based on available learning material.
+- Maintain persistent student memory such as learning history and weak areas.
+- Demonstrate agentic AI concepts including RAG, memory, and tool usage.
+- Run the complete system locally using open-source models through Ollama.
+- Avoid dependency on paid external AI APIs.
 
-The system follows a modular pipeline.
+## 2.2 Proposed Solution
 
-When a student uploads a course PDF:
+The proposed solution is an **AI-powered learning assistant** that combines
+Retrieval-Augmented Generation (RAG), persistent memory, and tool-based
+actions into a single agentic workflow.
 
-1. The PDF is loaded and divided into overlapping text chunks.
-2. The chunks are converted into embeddings using the local
-   `nomic-embed-text` model through Ollama.
-3. The embeddings are stored in a subject-specific ChromaDB vector store.
-4. When the student asks a question, the system retrieves the most
-   relevant chunks.
-5. A similarity-score threshold checks whether the question is actually
-   covered by the uploaded material.
-6. If relevant content is found, the retrieved information is combined
-   with recent conversation history and student learning information.
-7. The local `qwen2.5:7b` model generates a grounded response.
-8. Interactions and quiz performance are stored in SQLite memory.
+Students can provide their course materials, such as PDF notes and study
+documents. The system processes these materials and stores their information
+in a vector database.
 
-The same retrieval system supports the quiz and study-plan tools.
+When a student asks a question, the system retrieves the most relevant
+information from the course material and provides a context-aware response
+using a locally hosted Large Language Model (LLM).
 
-### Quiz Generation
+The assistant can also perform additional learning tasks through tools, such
+as generating quizzes and creating study plans. Student-related information
+is stored using persistent memory so that the assistant can provide more
+personalized support during future study sessions.
 
-The assistant retrieves relevant course content and uses the local LLM to
-generate multiple-choice questions, answers, explanations, and scores.
+The complete workflow is designed to run locally using **Ollama**, with no
+OpenAI API key or paid AI service required.
 
-### Study Plan Generation
+## 2.3 Proposed Architecture
 
-The assistant uses the available subject content to generate a
-day-by-day revision schedule progressing from basic to advanced topics.
+The overall system follows this agentic workflow:
+
+Student
+   ↓
+Streamlit User Interface
+   ↓
+AI Learning & Study Assistant
+   ↓
+┌─────────────────────────────────────┐
+│           Agentic Workflow          │
+├─────────────────────────────────────┤
+│  1. RAG / Knowledge Retrieval       │
+│  2. Persistent Student Memory       │
+│  3. Tool Selection & Execution      │
+│  4. Local LLM Response Generation   │
+└─────────────────────────────────────┘
+   ↓
+Personalized Study Response
+
+### RAG
+
+The RAG pipeline retrieves relevant information from the student's uploaded
+course materials before generating an answer. This helps keep responses
+grounded in the available learning content.
 
 ### Persistent Memory
 
-Conversation history, topics covered, and quiz results are stored locally,
-allowing the assistant to personalize future interactions.
+Student information and learning-related data are stored using SQLite-based
+persistent memory. This allows the assistant to retain useful information
+between sessions.
 
----
+### Tool Use
 
-# 2.3 Key Features
-
-### Subject-grounded Q&A
-
-Answers are generated using the uploaded course material rather than
-general internet knowledge.
-
-### Hallucination Guard
-
-A relevance-score check helps prevent the assistant from answering
-out-of-syllabus questions with fabricated information.
-
-### Persistent Memory
-
-The system remembers recent interactions and tracks weak topics.
-
-### Automatic Quiz Generation
-
-Generates topic-wise multiple-choice quizzes with explanations and
-score tracking.
-
-### Study Plan Generation
-
-Creates a day-by-day revision plan based on the selected subject.
-
-### Multi-subject Support
-
-Students can upload and switch between multiple course subjects.
+The assistant can use dedicated tools for learning-related tasks, including
+quiz generation and study-plan creation.
 
 ### Local AI
 
-The application uses Ollama and locally hosted models.
+The language model runs locally through **Ollama**, allowing the project to
+operate without requiring an OpenAI API key or paid external AI services.
+# 3. Agentic AI Pipeline & Architecture
 
-**No OpenAI API key or paid OpenAI account is required.**
+The AI Learning & Study Assistant follows an agentic workflow in which
+different components work together to understand the student's request,
+retrieve relevant information, use appropriate tools, and generate a useful
+response.
+
+## 3.1 Agentic Pipeline
+
+The main workflow is:
+
+Student Query
+   ↓
+Streamlit Interface
+   ↓
+AI Agent
+   ↓
+┌─────────────────────────────────────┐
+│         Decision / Reasoning        │
+│                                     │
+│  • Understand the user's request    │
+│  • Retrieve relevant material       │
+│  • Check student memory             │
+│  • Select required tools            │
+└─────────────────────────────────────┘
+   ↓
+┌──────────────┬───────────────┬───────────────┐
+│     RAG      │    Memory     │     Tools     │
+│              │               │               │
+│ Course       │ Student       │ Quiz          │
+│ material     │ history       │ Study plan    │
+│ retrieval    │ & progress    │ generation    │
+└──────────────┴───────────────┴───────────────┘
+   ↓
+Local LLM through Ollama
+   ↓
+Final Personalized Response
+   ↓
+Student
+
+## 3.2 Retrieval-Augmented Generation (RAG)
+
+The RAG component allows the assistant to answer questions using information
+from the student's course materials.
+
+The process consists of:
+
+1. Loading course documents.
+2. Splitting the documents into smaller sections.
+3. Generating embeddings for the document content.
+4. Storing the embeddings in ChromaDB.
+5. Retrieving the most relevant sections when a student asks a question.
+6. Providing the retrieved context to the language model.
+7. Generating a response based on the retrieved information.
+
+This approach helps the assistant focus on the student's actual learning
+materials instead of relying only on general model knowledge.
+
+## 3.3 Persistent Student Memory
+
+The assistant uses persistent memory to store useful student-related
+learning information.
+
+SQLite is used as the persistent storage layer.
+
+The memory component can be used to maintain information such as:
+
+- Previous learning interactions
+- Topics studied
+- Areas that need improvement
+- Learning progress
+- Other useful study-related information
+
+Persistent memory allows the assistant to provide more personalized support
+across multiple study sessions.
+
+## 3.4 Tool Usage
+
+The agent can use specialized Python tools for learning tasks.
+
+Examples include:
+
+- **Quiz Generation** — creates questions for testing understanding.
+- **Study Plan Generation** — helps organize topics into a structured study
+  schedule.
+- **Learning Support** — performs task-specific processing instead of using
+  the language model for every operation.
+
+Tool usage demonstrates an important agentic AI concept: the assistant can
+select and use external capabilities when they are more appropriate for the
+user's request.
+
+## 3.5 Local LLM Processing
+
+The project uses **Ollama** to run the language model locally.
+
+The intended LLM is:
+
+**Qwen 2.5 7B**
+
+The system also uses:
+
+**nomic-embed-text**
+
+for generating embeddings used by the RAG pipeline.
+
+Because the models run locally through Ollama, the project does not require
+an OpenAI API key or a paid external AI service.
+
+## 3.6 System Architecture
+
+The major components of the system are:
+
+| Component | Purpose |
+|-----------|---------|
+| Streamlit | Provides the web-based user interface |
+| Agent | Coordinates the learning workflow |
+| RAG Pipeline | Retrieves relevant course material |
+| ChromaDB | Stores and searches document embeddings |
+| Ollama | Runs the local LLM and embedding model |
+| SQLite | Stores persistent student memory |
+| Python Tools | Performs quiz and study-plan tasks |
+| Course Materials | Provides the student's learning knowledge base |
+
+Together, these components create an agentic study assistant capable of
+retrieving knowledge, maintaining memory, using tools, and generating
+personalized responses.
+
+# 4. Key Features
+
+The AI Learning & Study Assistant provides the following major features:
+
+## 4.1 Course Material-Based Question Answering
+
+Students can ask questions related to their uploaded course materials.
+
+The RAG pipeline retrieves relevant content from the knowledge base and uses
+that context to generate an informative answer.
+
+This helps students study from their own notes and course resources.
+
+## 4.2 Retrieval-Augmented Generation
+
+The system uses RAG to connect the local language model with the student's
+learning materials.
+
+Key steps include:
+
+- Document loading
+- Text processing and chunking
+- Embedding generation
+- Vector storage
+- Similarity-based retrieval
+- Context-aware answer generation
+
+## 4.3 AI-Powered Quiz Generation
+
+The assistant can generate topic-wise quizzes to help students test their
+understanding.
+
+Quizzes can be used for:
+
+- Self-assessment
+- Revision
+- Practice before examinations
+- Identifying topics that require additional study
+
+## 4.4 Personalized Study Plans
+
+The system can generate structured study plans to help students organize
+their preparation.
+
+A study plan can divide learning material into manageable topics and provide
+a clear sequence for revision.
+
+## 4.5 Persistent Student Memory
+
+The assistant maintains persistent learning information using SQLite.
+
+This allows useful student information to remain available between different
+sessions instead of being lost when the application is restarted.
+
+## 4.6 Local AI Processing
+
+The project uses Ollama for local AI model execution.
+
+This provides:
+
+- No OpenAI API key requirement
+- No paid OpenAI API usage
+- Local model execution
+- Greater control over the learning environment
+- Ability to work without sending study material to an external AI API
+
+## 4.7 Interactive Streamlit Interface
+
+The application provides a simple web interface using Streamlit.
+
+Students can interact with the assistant through the browser and access its
+learning capabilities from a single interface.
+
+## 4.8 Agentic AI Workflow
+
+Instead of functioning only as a basic chatbot, the system combines:
+
+- Reasoning and decision-making
+- Knowledge retrieval
+- Persistent memory
+- Tool execution
+- Local language-model generation
+
+This demonstrates the core concepts of an **Agentic AI system**.
+
+## 4.9 Student-Centric Learning Support
+
+The overall system is designed around the student's learning process.
+
+It combines course-material-based answers, quizzes, study planning, and
+persistent memory to create a more useful and personalized study companion.
+
+# 5. Technologies Used
+
+The project is built using Python and open-source technologies for local
+agentic AI development.
+
+| Technology | Purpose |
+|------------|---------|
+| Python 3.12 | Main programming language |
+| Ollama | Runs AI models locally |
+| Qwen 2.5 7B | Local Large Language Model |
+| nomic-embed-text | Local embedding model |
+| LangChain | Agent and AI workflow orchestration |
+| LangChain Community | Document loaders and integrations |
+| LangChain Ollama | Ollama model integration |
+| ChromaDB | Vector database for RAG |
+| SQLite | Persistent student memory |
+| Streamlit | Web-based user interface |
 
 ---
 
-# 3. Implementation & Results
+# 6. Installation & Setup
 
-## 3.1 Technologies / Tools Used
+## 6.1 Prerequisites
 
-| Component | Technology |
-|---|---|
-| LLM | Ollama (`qwen2.5:7b`) |
-| Embeddings | Ollama (`nomic-embed-text`) |
-| Vector Store | ChromaDB |
-| Orchestration | LangChain |
-| Memory Store | SQLite |
-| Frontend | Streamlit |
-| Language | Python 3.12 |
-| AI Runtime | Ollama |
-
-## 3.2 Key Agent Capabilities
-
-| Capability | Implementation |
-|---|---|
-| RAG | Course PDFs are chunked, embedded, and stored in ChromaDB. Relevant chunks are retrieved before generating answers. |
-| Memory | SQLite stores conversation history, topics covered, and quiz scores. |
-| Tools | LLM-powered quiz and study-plan generation. |
-
----
-
-# 3.3 Working Process
-
-### Day 1
-
-Selected the AI Learning & Study Assistant use case and configured the
-Python 3.12 environment and local Ollama models.
-
-### Day 2
-
-Built the RAG pipeline including PDF loading, text chunking, embeddings,
-and ChromaDB storage.
-
-### Day 3
-
-Added SQLite-backed conversation history, weak-topic tracking, and the
-similarity-score guard.
-
-### Day 4
-
-Implemented the LLM-driven quiz generator and study-plan generator.
-
-### Day 5
-
-Built the Streamlit interface with chat, quiz, study-plan, and progress
-features, together with multi-subject support and a custom visual theme.
-
----
-
-# 3.4 Screenshot / Output
-
-**Figure 1:** Home dashboard of the AI Learning & Study Assistant,
-showing the subject selector and the "Ask a Question" interface.
-
-Add screenshots of the working application here.
-
----
-
-# 3.5 Results Achieved
-
-- The RAG pipeline retrieves topic-specific information from uploaded
-  course material.
-- Questions related to the uploaded material receive grounded responses.
-- Out-of-scope questions can be rejected using the relevance-score guard.
-- The quiz generator creates multiple-choice questions with answer
-  tracking and explanations.
-- Quiz results are used to identify weak topics.
-- The study-plan generator creates logically sequenced revision plans.
-- Multiple subjects can be handled through the same interface.
-- The system operates using locally hosted Ollama models without requiring
-  an OpenAI API key.
-
----
-
-# 4. Conclusion & Future Scope
-
-## 4.1 Project Conclusion
-
-The **AI Learning & Study Assistant** demonstrates a complete agentic AI
-system combining RAG, memory, and tool use to solve a practical student
-learning problem.
-
-The project demonstrates key agentic AI concepts including:
-
-- Grounding LLM responses in retrieved data
-- Maintaining state across interactions
-- Using callable tools
-- Tracking student learning progress
-- Reducing hallucinations through relevance checking
-
-The complete system is implemented using open-source, locally hosted
-technology through Ollama.
-
-## 4.2 Challenges Faced
-
-### Local LLM limitations
-
-Smaller local LLMs may not always follow strict instructions to refuse
-out-of-scope questions. Therefore, a code-level similarity-score guard is
-used in addition to prompting.
-
-### Source document quality
-
-The quality of the uploaded document directly affects RAG performance.
-Content-rich course material produces better results than PDFs containing
-only topic lists or indexes.
-
-### Library compatibility
-
-Rapid changes in the LangChain ecosystem required adapting imports and
-package usage during development.
-
----
-
-# 4.3 Future Enhancements
-
-- Multi-user support with individual login and progress tracking
-- Support for PPTX and DOCX files
-- Support for scanned/OCR PDFs
-- Voice-based interaction
-- Improved personalized learning recommendations
-- Hosted deployment for larger-scale usage
-- Cloud-based vector storage for scalability
-
----
-
-# 4.4 References
-
-- LangChain Documentation
-- Ollama Documentation
-- ChromaDB Documentation
-- Streamlit Documentation
-- Course material: Human Values and Ethics (GE3791), Unit I —
-  Democratic Values
-
----
-
-# 5. Installation & Setup
-
-## Prerequisites
-
-Before running the project, install:
+Before running the project, install the following:
 
 - Python 3.12
-- Ollama
 - Git
+- Ollama
 
-## Install Python Dependencies
+The project is designed to run locally and does not require an OpenAI API key.
 
-Clone the repository:
+## 6.2 Clone the Repository
+
+Open Git Bash or a terminal and run:
+
+```bash
+git clone https://github.com/GowriCherry31/AI-Student-Support-Assistant.git
+
+## 6.2 Clone the Repository
+
+Open Git Bash or a terminal and run:
 
 ```bash
 git clone https://github.com/GowriCherry31/AI-Student-Support-Assistant.git
 cd AI-Student-Support-Assistant
+6.3 Create a Virtual Environment
+
+Create a Python virtual environment:
+
+python -m venv venv
+
+Activate it on Windows using Git Bash:
+
+source venv/Scripts/activate
+
+If using Command Prompt instead:
+
+venv\Scripts\activate
+6.4 Install Python Dependencies
+
+Install the required packages:
+
+pip install -r requirements.txt
+6.5 Install and Start Ollama
+
+Install Ollama on your system and make sure the Ollama application is
+running.
+
+Check that Ollama is available:
+
+ollama --version
+
+Pull the language model:
+
+ollama pull qwen2.5:7b
+
+Pull the embedding model:
+
+ollama pull nomic-embed-text
+
+Verify the installed models:
+
+ollama list
+
+You should see the required models in the list.
+
+6.6 Run the Application
+
+After activating the virtual environment and starting Ollama, run:
+
+streamlit run app.py
+
+Streamlit will provide a local address in the terminal. Open that address
+in your web browser to use the AI Learning & Study Assistant.
+
+6.7 Important Note
+
+The first model download can require significant disk space. The required
+storage depends on the Ollama models being downloaded.
+
+Once the models are downloaded, the application can use them locally without
+requiring an OpenAI API key.
+
+No paid OpenAI service is required for this project.
+
+
